@@ -1,4 +1,5 @@
 /*** includes ***/
+#include <time.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <ncurses.h>
@@ -14,8 +15,7 @@ typedef struct Room{
 	Position position;
 	int height;
 	int width;
-	/* Monster **monsters; */
-	/* Item **items; */
+	Position **doors;
 }Room;
 
 typedef struct Player{
@@ -57,6 +57,7 @@ int screenSetup(){
 	initscr();
 	noecho();
 	refresh();
+	srand(time(NULL));
 	return 0;
 }
 
@@ -66,33 +67,11 @@ Room **mapSetup(){
 	Room **rooms;
 	rooms = malloc(sizeof(Room) * 6);
 
-	/* mvprintw(13,13,"--------"); */
-	/* mvprintw(14,13,"|......|"); */
-	/* mvprintw(15,13,"|......|"); */
-	/* mvprintw(16,13,"|......|"); */
-	/* mvprintw(17,13,"|......|"); */
-	/* mvprintw(18,13,"--------"); */
-
 	rooms[0] = createRoom(13, 13, 6, 8);
 	drawRoom(rooms[0]);
 
-	/* mvprintw(1,40,"------------"); */
-	/* mvprintw(2,40,"|..........|"); */
-	/* mvprintw(3,40,"|..........|"); */
-	/* mvprintw(4,40,"............"); */
-	/* mvprintw(5,40,"|..........|"); */
-	/* mvprintw(6,40,"------------"); */
-
 	rooms[1] = createRoom(40, 2, 6, 8);
 	drawRoom(rooms[1]);
-
-	/* mvprintw(12,40,"--------"); */
-	/* mvprintw(13,40,"|......|"); */
-	/* mvprintw(14,40,"|......|"); */
-	/* mvprintw(15,40,"|......|"); */
-	/* mvprintw(16,40,"|......|"); */
-	/* mvprintw(17,40,"|......|"); */
-	/* mvprintw(18,40,"--------"); */
 
 	rooms[2] = createRoom(40, 12, 6, 12);
 	drawRoom(rooms[2]);
@@ -128,6 +107,11 @@ int drawRoom(Room *room){
 		}
 	}
 
+	/* draw doorss */
+	for(int i = 0; i < 4; i++){
+		mvprintw(room->doors[i]->y,room->doors[i]->x, "+");
+	}
+
 	return 0;
 }
 
@@ -138,6 +122,29 @@ Room *createRoom(int x, int y, int height, int width){
 	newRoom->position.y = y;
 	newRoom->width = width;
 	newRoom->height = height;
+
+
+	newRoom->doors = malloc(sizeof(Position) * 4);
+
+	/* top doors */
+	newRoom->doors[0] = malloc(sizeof(Position));
+	newRoom->doors[0]->x = rand() % (width - 2) + newRoom->position.x + 1;
+	newRoom->doors[0]->y = newRoom->position.y;
+
+	/* bottom doors */
+	newRoom->doors[1] = malloc(sizeof(Position));
+	newRoom->doors[1]->x = rand() % (width - 2) + newRoom->position.x + 1;
+	newRoom->doors[1]->y = newRoom->position.y+height - 1;
+
+	/* left doors */
+	newRoom->doors[2] = malloc(sizeof(Position));
+	newRoom->doors[2]->y = rand() % (height - 2) + newRoom->position.y + 1;
+	newRoom->doors[2]->x = newRoom->position.x;
+
+	/* right doors */
+	newRoom->doors[3] = malloc(sizeof(Position));
+	newRoom->doors[3]->y = rand() % (height - 2) + newRoom->position.y + 1;
+	newRoom->doors[3]->x = newRoom->position.x+width - 1;
 
 	return newRoom;
 }
